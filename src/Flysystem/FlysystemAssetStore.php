@@ -67,7 +67,10 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
                     imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
 
             }
-            imagedestroy($img);
+            
+            if(isset($img)){
+                imagedestroy($img);
+            }
         }
     }
 
