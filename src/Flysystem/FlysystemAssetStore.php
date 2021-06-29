@@ -59,15 +59,17 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
             switch ($type) {
                 case 2:
                     $img = imagecreatefromjpeg($path);
-                    if(file_exists($img)){
+                    if($img){
                         imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
                     }
                     break;
                 case 3:
                     $img = imagecreatefrompng($path);
-                    if(file_exists($img)){
+                    if($img){
                         imagesavealpha($img, true); // save alphablending setting (important)
-                        imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
+                        if($img){
+                            imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
+                        }
                     }
             }
             
