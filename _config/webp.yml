@@ -1,12 +1,29 @@
+---
+Name: webp
+After:
+  - "assetscore"
+  - "assetstore"
+Only:
+  envvarset:
+    - 'SS_ENABLE_WEBP'  
+---
+
+
 SilverStripe\Assets\File:
   allowed_extensions:
     - webp
+
 ---
 Name: webpcreatorflysystemassetstore
 After:
   - "assetscore"
   - "assetstore"
+Only:
+  envvarset:
+    - 'SS_ENABLE_WEBP'  
 ---
+
+
 SilverStripe\Core\Injector\Injector:
   SilverStripe\Assets\Storage\AssetStore:
     class: Nomidi\WebPCreator\Flysystem\FlysystemAssetStore
