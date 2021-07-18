@@ -62,9 +62,7 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
                 $img = imagecreatefrompng($path);
                 if ($img) {
                     imagesavealpha($img, true); // save alphablending setting (important)
-                    if ($img) {
-                        imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
-                    }
+                    imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
                 }
             }
 
