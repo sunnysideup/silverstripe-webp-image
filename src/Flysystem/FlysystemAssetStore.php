@@ -1,12 +1,15 @@
 <?php
 
-
 namespace Nomidi\WebPCreator\Flysystem;
 
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore as SS_FlysystemAssetStore;
 
 class FlysystemAssetStore extends SS_FlysystemAssetStore
 {
+    /**
+     * @var mixed
+     */
+    public $webp_quality;
     private static $webp_default_quality = 80;
 
     public function __construct()
@@ -14,32 +17,28 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
         $this->webp_quality = $this->config()->webp_default_quality;
     }
 
-
-    public function setFromString($data, $filename, $hash = null, $variant = null, $config = array())
+    public function setFromString($data, $filename, $hash = null, $variant = null, $config = [])
     {
         $fileID = $this->getFileID($filename, $hash);
         if ($this->getPublicFilesystem()->has($fileID)) {
             if ($filename) {
                 $extension = substr(strrchr($filename, '.'), 1);
-                $tmp_file  = TEMP_PATH . DIRECTORY_SEPARATOR . 'raw_' . uniqid() . '.' . $extension;
+                $tmp_file = TEMP_PATH . DIRECTORY_SEPARATOR . 'raw_' . uniqid() . '.' . $extension;
                 file_put_contents($tmp_file, $data);
-                $this->createWebPImage($tmp_file, $filename, $hash, $variant, $config);
+                $this->createWebPImage($tmp_file, $filename, $hash, $variant);
             }
         }
+
         return parent::setFromString($data, $filename, $hash, $variant, $config);
     }
 
-
-
-
-
-    public function setFromLocalFile($path, $filename = null, $hash = null, $variant = null, $config = array())
+    public function setFromLocalFile($path, $filename = null, $hash = null, $variant = null, $config = [])
     {
         if ($filename) {
-            if (isset($config['visibility']) && $config['visibility'] === self::VISIBILITY_PROTECTED) {
+            if (isset($config['visibility']) && self::VISIBILITY_PROTECTED === $config['visibility']) {
                 //todo: generate protected webp image
             } else {
-                $this->createWebPImage($path, $filename, $hash, $variant, $config);
+                $this->createWebPImage($path, $filename, $hash, $variant);
             }
         }
 
@@ -50,30 +49,26 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
     public function createWebPImage($path, $filename, $hash, $variant = false)
     {
         if (function_exists('imagewebp') && function_exists('imagecreatefromjpeg') && function_exists('imagecreatefrompng')) {
-            $orgpath = './'.$this->getAsURL($filename, $hash, $variant);
-
-
+            $orgpath = './' . $this->getAsURL($filename, $hash, $variant);
 
             list($width, $height, $type, $attr) = getimagesize($path);
 
-            switch ($type) {
-                case 2:
-                    $img = imagecreatefromjpeg($path);
-                    if($img){
+            if (2 === $type) {
+                $img = imagecreatefromjpeg($path);
+                if ($img) {
+                    imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
+                }
+            } elseif (3 === $type) {
+                $img = imagecreatefrompng($path);
+                if ($img) {
+                    imagesavealpha($img, true); // save alphablending setting (important)
+                    if ($img) {
                         imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
                     }
-                    break;
-                case 3:
-                    $img = imagecreatefrompng($path);
-                    if($img){
-                        imagesavealpha($img, true); // save alphablending setting (important)
-                        if($img){
-                            imagewebp($img, $this->createWebPName($orgpath), $this->webp_quality);
-                        }
-                    }
+                }
             }
-            
-            if(isset($img)){
+
+            if (isset($img)) {
                 imagedestroy($img);
             }
         }
@@ -84,6 +79,7 @@ class FlysystemAssetStore extends SS_FlysystemAssetStore
         $picname = pathinfo($filename, PATHINFO_FILENAME);
         $directory = pathinfo($filename, PATHINFO_DIRNAME);
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
-        return $directory.'/'.$picname.'_'.$extension.'.webp';
+
+        return $directory . '/' . $picname . '_' . $extension . '.webp';
     }
 }
