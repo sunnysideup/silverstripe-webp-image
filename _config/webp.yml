@@ -5,13 +5,18 @@ After:
   - "assetstore"
 Only:
   envvarset:
-    - 'SS_ENABLE_WEBP'  
+    - 'SS_ENABLE_WEBP'
 ---
 
 
 SilverStripe\Assets\File:
   allowed_extensions:
     - webp
+
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Assets\Image_Backend:
+    properties:
+      Quality: 40
 
 ---
 Name: webpcreatorflysystemassetstore
@@ -20,7 +25,7 @@ After:
   - "assetstore"
 Only:
   envvarset:
-    - 'SS_ENABLE_WEBP'  
+    - 'SS_ENABLE_WEBP'
 ---
 
 
