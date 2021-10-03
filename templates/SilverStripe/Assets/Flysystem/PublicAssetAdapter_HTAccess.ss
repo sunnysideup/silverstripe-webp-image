@@ -50,3 +50,13 @@ AddHandler default-handler php phtml php3 php4 php5 inc
 <IfModule mod_mime.c>
   AddType image/webp .webp
 </IfModule>
+
+<IfModule mod_expires.c>
+    ExpiresActive On
+    ExpiresByType image/jpg "access plus 1 month"
+    ExpiresByType image/jpeg "access plus 1 month"
+    ExpiresByType image/gif "access plus 1 month"
+    ExpiresByType image/png "access plus 1 month"
+    ExpiresByType image/webp "access plus 1 month"
+    ExpiresByType image/x-icon "access plus 1 year"
+</IfModule>
